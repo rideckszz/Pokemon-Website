@@ -1,0 +1,73 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ stats.name }} - Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    .pokemon-container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    .stats {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .type {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .pokemon-image {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="pokemon-container">
+    <h1>{{ stats.name }}</h1>
+    <img src="{{ stats.sprite }}" alt="{{ stats.name }}" class="pokemon-image">
+    <div class="stats">
+      <div class="stat"><strong>HP:</strong> <span>{{ stats.hp }}</span></div>
+      <div class="stat"><strong>Attack:</strong> <span>{{ stats.attack }}</span></div>
+      <div class="stat"><strong>Defense:</strong> <span>{{ stats.defense }}</span></div>
+      <div class="stat"><strong>Special Attack:</strong> <span>{{ stats.special_attack }}</span></div>
+      <div class="stat"><strong>Special Defense:</strong> <span>{{ stats.special_defense }}</span></div>
+      <div class="stat"><strong>Speed:</strong> <span>{{ stats.speed }}</span></div>
+    </div>
+    <div class="type">
+      <strong>Type:</strong> {{ stats.type1 }}{% if stats.type2 %} / {{ stats.type2 }}{% endif %}
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    /* Centering Registration Form */
+    .register-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin-top: 70px; /* Offset for fixed navbar */
+      text-align: center;
+    }
+
+    /* Form Box */
+    .register-box {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      width: 350px;
+    }
+
+    .register-box h2 {
+      font-size: 32px;
+      font-family: 'Staatliches', sans-serif;
+      margin-bottom: 10px;
+    }
+
+    .separator {
+      width: 50%;
+      height: 2px;
+      background-color: #000;
+      margin: 10px auto;
+    }
+
+    .pokeball-icon {
+      width: 40px;
+      margin-bottom: 20px;
+    }
+
+    /* Form Styling */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      text-align: left;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 18px;
+      color: #fff;
+      background-color: #BA3333;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #a12828;
+    }
+  </style>
+</head>
+<body>
+  <!-- Registration Form Content -->
+  <div class="register-container">
+    <div class="register-box">
+      <!-- Title -->
+      <h2>Registrar</h2>
+      <div class="separator"></div>
+
+      <!-- Pokéball Icon -->
+      <img src="{% static 'Pokeball/Pokemon-Pokeball-PNG-Photo.png' %}" alt="Pokéball Icon" class="pokeball-icon">
+
+      <!-- Form -->
+      <form method="post">
+        {% csrf_token %}
+        <label for="username">Nome de Usuário:</label>
+        <input type="text" name="username" id="username" placeholder="Digite seu nome de usuário" required>
+
+        <label for="email">E-mail:</label>
+        <input type="email" name="email" id="email" placeholder="Digite seu e-mail" required>
+
+        <label for="password">Senha:</label>
+        <input type="password" name="password" id="password" placeholder="Digite sua senha" required>
+
+        <label for="password2">Confirmar Senha:</label>
+        <input type="password" name="password2" id="password2" placeholder="Confirme sua senha" required>
+
+        <button type="submit">Registrar</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

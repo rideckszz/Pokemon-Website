@@ -1,0 +1,100 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Time</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #000000;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 100px;
+    }
+
+    h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    form {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    input {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 10px;
+      background-color: #BA3333;
+      color: #fff;
+      font-size: 18px;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #a12828;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Criar Novo Time</h2>
+    <form method="post">
+      {% csrf_token %}
+      <label for="team_name">Nome do Time:</label>
+      <input type="text" name="team_name" id="team_name" placeholder="Digite o nome do time" required>
+
+      {% for i in "123456" %}
+        <label for="pokemon_{{ i }}">Pokémon {{ i }}:</label>
+        <input type="text" name="pokemon_{{ i }}" id="pokemon_{{ i }}" list="pokemon_list" placeholder="Digite o nome do Pokémon" required>
+      {% endfor %}
+
+      <!-- Datalist for autofill -->
+      <datalist id="pokemon_list">
+        {% for pokemon in pokemon_list %}
+          <option value="{{ pokemon }}"></option>
+        {% endfor %}
+      </datalist>
+
+      <button type="submit">Salvar Time</button>
+    </form>
+  </div>
+</body>
+</html>

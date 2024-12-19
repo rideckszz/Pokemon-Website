@@ -1,0 +1,61 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ team.team_name }}</title>
+  <style>
+    /* Sidebar */
+    .sidebar { width: 300px; background-color: #e0e0e0; padding: 20px; }
+    .team-item { display: flex; align-items: center; background-color: #fff; padding: 10px; margin-bottom: 10px; }
+    .team-item img { width: 20px; margin-right: 10px; }
+    .team-item:hover { background-color: #dcdcdc; cursor: pointer; }
+
+    /* Main Content */
+    .main-content { flex: 1; padding: 20px; }
+    .selected-card { background-color: #fff; border: 2px solid #ffcc00; padding: 20px; text-align: center; margin-bottom: 20px; }
+    .pokemon-card { display: inline-block; background-color: #fff; border: 1px solid #ccc; text-align: center; width: 150px; margin: 10px; }
+    .pokemon-card img { width: 80px; margin: 10px; }
+  </style>
+</head>
+<body>
+  <div style="display: flex;">
+    {% include 'sidebar.html' %}
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <h1>{{ team.team_name }}</h1>
+
+      <!-- Selected Pokémon -->
+      {% if selected_pokemon %}
+      <div class="selected-card">
+        <h2>{{ selected_pokemon.name }}</h2>
+        <img src="{{ selected_pokemon.sprite }}" alt="{{ selected_pokemon.name }}">
+        <p>HP: {{ selected_pokemon.hp }}</p>
+        <p>Attack: {{ selected_pokemon.attack }}</p>
+        <p>Defense: {{ selected_pokemon.defense }}</p>
+        <p>Sp. Attack: {{ selected_pokemon.special_attack }}</p>
+        <p>Sp. Defense: {{ selected_pokemon.special_defense }}</p>
+        <p>Speed: {{ selected_pokemon.speed }}</p>
+      </div>
+      {% endif %}
+
+      <!-- Other Pokémon -->
+      <div>
+        {% for pokemon in team_pokemon %}
+        <a href="?pokemon={{ pokemon.name }}" style="text-decoration: none;">
+          <div class="pokemon-card">
+            <img src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}">
+            <p>{{ pokemon.name }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

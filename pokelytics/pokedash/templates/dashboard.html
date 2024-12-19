@@ -1,0 +1,194 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: flex;
+      margin-top: 70px; /* Offset for navbar */
+      min-height: calc(100vh - 70px);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+    }
+
+    /* Welcome Header */
+    .welcome-header {
+      font-size: 36px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    /* Card Layout */
+    .card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    .card h3 {
+      font-size: 24px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 16px;
+      color: #777;
+      margin-bottom: 20px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      background-color: #BA3333;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #a12828;
+    }
+
+    .btn-blue {
+      background-color: #1E90FF;
+    }
+
+    .btn-blue:hover {
+      background-color: #187bcd;
+    }
+
+    /* Team Card Layout */
+    .team-list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 15px;
+    }
+
+    .team-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .team-card span {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* Plot Container */
+    .plot-container {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .plot-container img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .plot-header {
+      font-size: 20px;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    {% include 'sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Welcome Message -->
+      <div class="welcome-header">
+        Bem-vindo, {{ user.username }}!
+      </div>
+
+      <!-- Action Card -->
+      <div class="card">
+        <h3>Gerencie suas Equipes Pokémon</h3>
+        <p>Crie, visualize e analise as estatísticas das suas equipes Pokémon.</p>
+        <a href="{% url 'create_team' %}" class="btn">Criar Nova Equipe</a>
+      </div>
+
+      <!-- Teams Section -->
+      {% if teams %}
+        <div class="card">
+          <h3>Suas Equipes</h3>
+          <div class="team-list">
+            {% for team in teams %}
+              <div class="team-card">
+                <span>{{ team.team_name }}</span>
+                <a href="{% url 'team_detail' team.id %}" class="btn btn-blue">Detalhes</a>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Team Data Plots -->
+        <div class="plot-container">
+          <div class="plot-header">Estatísticas das suas Equipes</div>
+          {% for team_plot in team_plots %}
+            <div class="team-plot">
+              <img src="data:image/png;base64,{{ team_plot }}" alt="Team Plot">
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="card">
+          <h3>Nenhuma equipe criada</h3>
+          <p>Que tal começar criando sua primeira equipe?</p>
+          <a href="{% url 'create_team' %}" class="btn">Criar Equipe</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

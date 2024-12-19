@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokéLytics</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      height: 100%;
+    }
+
+    .background img {
+      position: absolute;
+      top: 0;
+      right: -200px;
+      width: 1200px;
+      height: auto;
+      transform: rotate(25deg);
+      opacity: 0.1;
+    }
+
+    /* Barra de Navegação */
+    .top-bar {
+      width: 100%;
+      height: 70px;
+      background-color: #BA3333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 64px;
+      position: fixed;
+      top: 0;
+      z-index: 10;
+    }
+
+    .top-bar .logo-title {
+      display: flex;
+      align-items: center;
+    }
+
+    .top-bar img {
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
+    }
+
+    .top-bar h1 {
+      color: #fff;
+      font-size: 28px;
+      font-family: 'Staatliches', sans-serif;
+      letter-spacing: 1px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 16px;
+    }
+
+    .buttons a {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 16px;
+      color: #fff;
+      font-family: 'Jersey 10', sans-serif;
+      text-decoration: none;
+    }
+
+    .buttons .login a {
+      background-color: #2C2C2C;
+    }
+
+    /* Conteúdo Principal */
+    .container {
+      margin-top: 80px; /* Espaço para a barra fixa */
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+    }
+
+    /* Seção Esquerda */
+    .left {
+      width: 50%;
+    }
+
+    .title {
+      font-size: 48px;
+      font-family: 'Jersey 10', sans-serif;
+      color: #000;
+      margin-bottom: 20px;
+    }
+
+    .info {
+      font-size: 24px;
+      font-family: 'Noto Sans', sans-serif;
+      line-height: 1.8;
+    }
+
+    .info div {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .info img {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px;
+    }
+
+    /* Botão Principal */
+    .cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #FC0C0C;
+      color: #fff;
+      font-size: 24px;
+      border-radius: 50px;
+      width: 300px;
+      height: 60px;
+      font-family: 'Jersey 20', sans-serif;
+      cursor: pointer;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Barra de Navegação -->
+  <div class="top-bar">
+    <div class="logo-title">
+      <img src="{% static 'Pokeball/Pokemon-Pokeball-PNG-Photo.png' %}" alt="Logo Pokéball">
+      <h1>PokéLytics</h1>
+    </div>
+
+    <div class="buttons">
+      <a href="{% url 'register' %}">Criar Conta</a>
+      <div class="login">
+        <a href="{% url 'login' %}">LOGIN</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Fundo -->
+    <div class="background">
+      <img src="{% static 'Pokeball/Pokemon-Pokeball-PNG-Photo.png' %}" alt="Fundo">
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="container">
+      <!-- Lado Esquerdo -->
+      <div class="left">
+        <div class="title">Seus Pokémon favoritos em gráficos</div>
+        <div class="info">
+          <div>
+            <img src="{% static 'Pokeball/pokeball_icon_136305.png' %}" alt="Ícone 1"> Monte times competitivos
+          </div>
+          <div>
+            <img src="{% static 'Pokeball/pokeball_icon_136305.png' %}" alt="Ícone 2"> Avalie pontos fortes e fracos
+          </div>
+          <div>
+            <img src="{% static 'Pokeball/pokeball_icon_136305.png' %}" alt="Ícone 3"> Construa a melhor estratégia
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão Principal -->
+      <div class="cta">
+        Crie sua conta grátis
+      </div>
+    </div>
+  </div>
+</body>
+</html>

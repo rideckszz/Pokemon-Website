@@ -1,0 +1,102 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fazer Login</title>
+  <style>
+    /* Centering the Login Form */
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin-top: 70px; /* Navbar offset */
+      text-align: center;
+    }
+
+    .login-box h2 {
+      font-size: 36px;
+      font-family: 'Staatliches', sans-serif;
+      margin-bottom: 10px;
+    }
+
+    .separator {
+      width: 50%;
+      height: 2px;
+      background-color: #000;
+      margin: 10px auto;
+    }
+
+    .pokeball-icon {
+      width: 40px;
+      margin: 20px 0;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    label {
+      text-align: left;
+      font-weight: bold;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 18px;
+      color: #fff;
+      background-color: #BA3333;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #a12828;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <h2>Fazer Login</h2>
+      <div class="separator"></div>
+      <img src="{% static 'Pokeball/Pokemon-Pokeball-PNG-Photo.png' %}" alt="Pokéball" class="pokeball-icon">
+
+      <form method="post">
+        {% csrf_token %}
+        <label for="username">Nome de usuário ou e-mail:</label>
+        <input type="text" name="username" id="username" required>
+    
+        <label for="password">Senha:</label>
+        <input type="password" name="password" id="password" required>
+    
+        <button type="submit">Entrar</button>
+    </form>
+    
+    {% if messages %}
+      <div style="color: red; margin-top: 10px;">
+        {% for message in messages %}
+          <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    </div>
+  </div>
+</body>
+</html>

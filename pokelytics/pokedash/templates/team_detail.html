@@ -1,0 +1,298 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ team.team_name }}</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #000;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: flex;
+      height: calc(100vh - 70px);
+      margin-top: 70px; /* Offset for fixed navbar */
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 300px;
+      background-color: #e0e0e0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      font-size: 24px;
+      font-family: 'Staatliches', sans-serif;
+      margin-bottom: 20px;
+    }
+
+    .sidebar hr {
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+    }
+
+    .team-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .team-item {
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .team-item img {
+      width: 20px;
+      margin-right: 10px;
+    }
+
+    .team-item:hover {
+      background-color: #dcdcdc;
+      cursor: pointer;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .team-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .team-header h1 {
+      font-size: 28px;
+      font-family: 'Staatliches', sans-serif;
+    }
+
+    .delete-button {
+      background-color: #ff4d4f;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .delete-button:hover {
+      background-color: #d9363e;
+    }
+
+    .selected-pokemon-card {
+        display: flex;
+        align-items: center; /* Align vertically */
+        justify-content: center; /* Align horizontally */
+        background-color: #fff;
+        border: 3px solid #fd3c3c;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 25px auto; /* Center the box horizontally */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        gap: 20px; /* Space between image and stats */
+        max-width: 780px; /* Restrict the width of the content */
+    }
+
+    .selected-pokemon-card img {
+    width: 200px; /* Adjust the size of the image */
+    height: auto;
+    }
+
+    .stats {
+    gap: 5px; /* Space between stats */
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Full width for stats */
+    }
+
+        .stat-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    }
+
+    .stat-label {
+    width: 100px;
+    font-weight: bold;
+    }
+
+        .stat-bar {
+    flex: 1;
+    height: 10px;
+    background: #ddd; /* Light grey background */
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden; /* Clip the child gradient */
+    }
+
+    .stat-fill {
+    height: 100%;
+    background-image: linear-gradient(to right, red, cyan);
+    background-size: 100% 100%; /* Fixed gradient across the bar */
+    border-radius: 5px;
+    width: calc(var(--stat-value) / 255 * 100%); /* Dynamic filled width */
+    }
+
+
+
+    .stat-value {
+    width: 40px;
+    text-align: right;
+    font-weight: bold;
+    }
+
+
+
+    /* Pokémon Grid */
+    .pokemon-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .pokemon-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+
+    .pokemon-card img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+
+    .selected-pokemon-card h2 {
+        margin-bottom: 15px; /* Add bottom margin for spacing */
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .pokemon-card span {
+      font-size: 21px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    {% include 'sidebar.html' %}
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="team-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>{{ team.team_name }}</h1>
+        
+            <!-- Buttons Container -->
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <!-- Delete Team Button -->
+              <form method="post" action="{% url 'delete_team' team.id %}" style="margin: 0;">
+                  {% csrf_token %}
+                  <button type="submit" style="
+                    padding: 8px 16px;
+                    background-color: #BA3333;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    transition: background-color 0.3s;
+                  " onmouseover="this.style.backgroundColor='#a12828'" onmouseout="this.style.backgroundColor='#BA3333'">
+                    Deletar Time
+                  </button>
+              </form>
+              
+              <!-- Analyze Team Button -->
+              <a href="{% url 'team_analysis' team.id %}" style="text-decoration: none;">
+                <button type="button" style="
+                  padding: 8px 16px;
+                  background-color: #1E90FF;
+                  color: white;
+                  border: none;
+                  border-radius: 8px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  transition: background-color 0.3s;
+                " onmouseover="this.style.backgroundColor='#187bcd'" onmouseout="this.style.backgroundColor='#1E90FF'">
+                  Analisar Time
+                </button>
+              </a>
+            </div>
+        </div>        
+          
+      <!-- Selected Pokémon -->
+      {% if selected_pokemon %}
+      <div class="selected-pokemon-card">
+        <!-- Pokémon Image -->
+        <img src="{{ selected_pokemon.sprite }}" alt="{{ selected_pokemon.name }}">
+        
+        <!-- Pokémon Stats -->
+        <div class="stats">
+          <h2>{{ selected_pokemon.name }}</h2>
+          {% for stat_label, stat_value in selected_pokemon.items %}
+            {% if stat_label not in "name sprite" %}
+            <div class="stat-row">
+              <div class="stat-label">{{ stat_label|capfirst }}:</div>
+              <div class="stat-bar style="--stat-value: {{ stat_value }}">
+                <div class="stat-fill" style="width: calc({{ stat_value }} / 255 * 100%);"></div>
+              </div>
+              <div class="stat-value">{{ stat_value }}</div>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      
+
+      <!-- Other Pokémon Grid -->
+      <div class="pokemon-grid">
+        {% for pokemon in team_pokemon %}
+        <a href="?pokemon={{ pokemon.name }}" style="text-decoration: none; color: inherit;">
+          <div class="pokemon-card">
+            <img src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}">
+            <span>{{ pokemon.name }}</span>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

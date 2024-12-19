@@ -1,0 +1,12 @@
+<h2>Create Pokémon Team</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Team</button>
+</form>
+<h3>Available Pokémon:</h3>
+<ul>
+{% for pokemon in pokemon_list %}
+    <li>{{ pokemon }}</li>
+{% endfor %}
+</ul>
