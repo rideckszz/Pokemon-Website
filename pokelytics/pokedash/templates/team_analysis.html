@@ -1,7 +1,6 @@
 {% load static %}
 {% include 'navbar.html' %}
 
-    
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,131 +14,108 @@
       padding: 0;
       box-sizing: border-box;
     }
-
+  
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
       color: #000000;
-    }
-
-    /* Page Layout */
-    .page-container {
-      display: flex;
-      margin-top: 70px; /* Offset for navbar */
-      height: calc(100vh - 70px);
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 300px;
-      background-color: #d9d9d9;
-      padding: 20px;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .sidebar h2 {
-      text-align: center;
-      font-size: 24px;
-      font-family: 'Staatliches', sans-serif;
-      margin-bottom: 20px;
-    }
-
-    .sidebar hr {
-      margin: 0 auto 20px;
-      border: 1px solid #aaa;
-    }
-
-    .team-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .team-item {
-      display: flex;
-      align-items: center;
-      background-color: #fff;
-      border: 2px solid #000;
-      border-radius: 8px;
-      padding: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .team-item img {
-      width: 20px;
-      margin-right: 10px;
-    }
-
-    .team-item:hover {
-      background-color: #f4f4f4;
-    }
-
-    /* Add Team Button */
-    .team-add {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #c4c4c4;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      margin: 20px auto;
-      font-size: 24px;
-      font-weight: bold;
-      color: #555;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .team-add:hover {
-      background-color: #b3b3b3;
+      line-height: 1.6;
     }
 
     /* Main Content */
     .main-content {
-      flex: 1;
+      max-width: 1800px;
+      margin: 100px auto 20px;
       padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    h1 {
+    /* Emphasized Title */
+    .team-title {
       text-align: center;
+      color: #BA3333;
       margin-bottom: 20px;
+      font-size: 36px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #BA3333;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Back Button */
+    .back-button {
+      display: inline-block;
+      margin-bottom: 20px;
+      background-color: #BA3333;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #a12828;
     }
 
     /* Charts Grid */
     .chart-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
     }
 
+    /* Chart Containers */
     .chart-container {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 20px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      height: 350px; /* Fixed height for graphs */
-      overflow: hidden;
+      text-align: center;
+      width: 100%;
     }
 
     .chart-container h3 {
-      text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      color: #333;
+      font-size: 18px;
+      font-weight: bold;
     }
 
     iframe {
       width: 100%;
-      height: 90%;
+      height: auto;
+      min-height: 400px;
       border: none;
+    }
+
+    /* Single Pokémon Grid */
+    .single-pokemon-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .single-pokemon-grid .chart-container {
+      height: auto;
+      min-height: 400px;
     }
 
     /* Pokémon Grid */
     .pokemon-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 20px;
       justify-content: center;
       margin-top: 40px;
     }
@@ -147,65 +123,89 @@
     .pokemon-card {
       text-align: center;
       border: 1px solid #ddd;
-      padding: 10px;
-      border-radius: 8px;
-      background-color: #fff;
+      padding: 0;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+      overflow: hidden;
+    }
+
+    .pokemon-card a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      width: 100%;
+      height: 100%;
     }
 
     .pokemon-card img {
-      width: 100px;
-      height: 100px;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
     }
 
     .pokemon-card h3 {
-      margin: 10px 0 0;
+      margin: 10px 0;
+      color: #333;
     }
+
+  h2.pokemon-title {
+    text-align: center;
+    color: #BA3333;
+    margin: 60px auto 10px; /* Adjusted margin: 60px above, 10px below */
+    font-weight: bold;
+  }
+
   </style>
 </head>
 <body>
-  <div class="page-container">
-    <div style="display: flex;">
-    {% include 'sidebar.html' %}
+  {% include 'navbar.html' %}
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Back Button -->
+    <a href="{% url 'dashboard' %}" class="back-button">← Voltar para Equipes</a>
+
+    <!-- Emphasized Team Title -->
+    <div class="team-title">{{ team.team_name }}</div>
+
+    <!-- Full Width Charts -->
+    <div class="chart-grid">
+      <div class="chart-container">
+        <h3>Comparativo de Estatísticas</h3>
+        {{ radar_chart|safe }}
+      </div>
+
+      <div class="chart-container">
+        <h3>Mapa de Calor - Fraqueza do Time</h3>
+        {{ team_heatmap|safe }}
+      </div>
     </div>
-    <!-- Main Content -->
-    <div class="main-content">
-      <h1>Análise do Time: {{ team.team_name }}</h1>
 
-      <!-- Charts Grid -->
-      <div class="chart-grid">
-        <!-- Radar Chart -->
+    <h2 style="text-align: center; margin-top: 40px;">Estatísticas Individuais dos Pokémon</h2>
+
+    <div class="single-pokemon-grid">
+      {% for name, bar_plot in bar_plots.items %}
         <div class="chart-container">
-          <h3>Comparativo de Estatísticas</h3>
-          {{ radar_chart|safe }}
+          <h3>{{ name }} - Estatísticas</h3>
+          <img src="data:image/png;base64,{{ bar_plot }}" alt="Bar Plot for {{ name }}">
         </div>
+      {% endfor %}
+    </div>
+    
 
-        <!-- Stacked Bar Chart -->
-        <div class="chart-container">
-          <h3>Estatísticas Empilhadas</h3>
-          {{ bar_chart|safe }}
-        </div>
-
-        <!-- Matchup Heatmaps -->
-        {% for name, graph in matchup_graphs.items %}
-          <div class="chart-container">
-            <h3>{{ name }} - Fraquezas</h3>
-            {{ graph|safe }}
-          </div>
-        {% endfor %}
-      </div>
-
-      <!-- Pokémon Grid -->
-      <h2 style="text-align: center; margin-top: 40px;">Pokémon do Time</h2>
-      <div class="pokemon-grid">
-        {% for pokemon in team_pokemon %}
-          <a href="?pokemon={{ pokemon.name }}" style="text-decoration: none; color: inherit;">
-            <div class="pokemon-card">
-              <img src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}">
-              <h3>{{ pokemon.name }}</h3>
-            </div>
+    <!-- Pokémon Grid -->
+    <h2 class="pokemon-title">Pokémons do Time</h2>
+    <div class="pokemon-grid">
+      {% for pokemon in team_pokemon %}
+        <div class="pokemon-card">
+          <a href="?pokemon={{ pokemon.name }}">
+            <img src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}">
+            <h3>{{ pokemon.name }}</h3>
           </a>
-        {% endfor %}
-      </div>
+        </div>
+      {% endfor %}
     </div>
   </div>
 </body>

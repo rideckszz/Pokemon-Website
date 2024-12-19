@@ -1,4 +1,7 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+
 from . import views
 
 urlpatterns = [
@@ -12,5 +15,6 @@ urlpatterns = [
     path('team/<int:team_id>/delete/', views.delete_team, name='delete_team'),
     path('pokemon/<str:pokemon_name>/', views.pokemon_detail, name='pokemon_detail'),
     path('team/<int:team_id>/analysis/', views.team_analysis, name='team_analysis'),
-
+    path('profile/', views.profile, name='profile'),
+    path('settings/', views.settings, name='settings'),
 ]

@@ -15,8 +15,8 @@
     background-color: #BA3333;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Space between logo-title and buttons */
-    padding: 0 20px; /* Reduced padding for proper alignment */
+    justify-content: space-between;
+    padding: 0 20px;
     position: fixed;
     top: 0;
     z-index: 10;
@@ -25,63 +25,95 @@
   /* Logo and Title */
   .logo-title {
     display: flex;
-    align-items: center; /* Align everything in the middle vertically */
-    gap: 10px; /* Spacing between image and title */
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-title a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    gap: 10px;
   }
 
   .logo-title img {
-    width: 50px;
-    height: 50px;
-    object-fit: contain; /* Ensure the image stays within the size */
-    vertical-align: middle; /* Align the image to the text baseline */
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
   }
 
   .logo-title h1 {
     margin: 0;
-    padding: 0;
     color: #fff;
     font-size: 28px;
     font-family: 'Staatliches', sans-serif;
-    line-height: 50px; /* Match the height of the logo image */
-    white-space: nowrap; /* Prevent text wrapping */
-    display: flex;
-    align-items: center;
+    white-space: nowrap;
   }
 
-  /* Buttons and User Greeting */
+  /* Dropdown Menu */
   .buttons {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 16px;
   }
 
-  .buttons span {
-    color: #fff;
-    font-size: 16px;
-    margin-right: 10px;
-    white-space: nowrap; /* Keep text on one line */
+  .dropdown {
+    position: relative;
   }
 
-  .buttons a {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 8px;
+  .dropdown-button {
+    color: #fff;
     font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: color 0.3s ease;
+  }
+
+  .dropdown-button:hover {
+    color: #ddd;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%; /* Position below button */
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    z-index: 20;
+    min-width: 150px;
+    overflow: hidden;
+  }
+
+  .dropdown-content a {
+    display: block;
+    padding: 10px 20px;
     text-decoration: none;
-    background-color: #eee9e9;
-    color: #111111;
-    font-family: Arial, sans-serif;
+    color: #333;
     transition: background-color 0.3s ease;
   }
 
-  .buttons a:hover {
-    background-color: #1e1e1e;
-    color: #fff;
+  .dropdown-content a:hover {
+    background-color: #f4f4f4;
+    color: #BA3333;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
   }
 
   .logout-button {
     background-color: #2C2C2C;
     color: #fff;
+    border-radius: 8px;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
   }
 
   .logout-button:hover {
@@ -93,19 +125,26 @@
 <div class="top-bar">
   <!-- Logo and Title -->
   <div class="logo-title">
-    <img src="{% static 'Pokeball/Pokemon-Pokeball-PNG-Photo.png' %}" alt="Logo Pokéball">
-    <h1>PokéLytics</h1>
+    <a href="{% url 'dashboard' %}">
+      <img src="{% static 'Pokeball/PokéLytics_white.png' %}" alt="Logo Pokéball">
+    </a>
   </div>
 
   <!-- Buttons -->
   <div class="buttons">
     {% if user.is_authenticated %}
-      <!-- Greeting and Logout Button -->
-      <span>Olá, {{ user.username }}</span>
-      <a href="{% url 'logout' %}" class="logout-button">SAIR</a>
+      <!-- Dropdown Menu -->
+      <div class="dropdown">
+        <button class="dropdown-button">Olá, {{ user.username }} &#9662;</button>
+        <div class="dropdown-content">
+          <a href="{% url 'profile' %}">Meu Perfil</a>
+          <a href="{% url 'settings' %}">Configurações</a>
+          <a href="{% url 'logout' %}">Sair</a>
+        </div>
+      </div>
     {% else %}
       <!-- Login and Register Buttons -->
-      <a href="{% url 'register' %}">Criar Conta</a>
+      <a href="{% url 'register' %}" class="logout-button">Criar Conta</a>
       <a href="{% url 'login' %}" class="logout-button">LOGIN</a>
     {% endif %}
   </div>

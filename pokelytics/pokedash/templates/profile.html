@@ -1,0 +1,199 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    /* Profile Container */
+    .profile-container {
+      width: 95%;
+      max-width: 1200px;
+      margin: 100px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column; /* Ensure footer comes below the content */
+      overflow: hidden;
+    }
+
+    /* Header Section */
+    .profile-header {
+      background-color: #BA3333;
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .profile-header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    /* Profile Content Grid */
+    .profile-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      padding: 30px;
+      flex-grow: 1; /* Stretch the content to push the footer down */
+    }
+
+    /* User Info */
+    .profile-info, .profile-options {
+      background: #f9f9f9;
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-info h2, .profile-options h2 {
+      margin-bottom: 15px;
+      font-size: 22px;
+      color: #BA3333;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    .profile-info p {
+      margin: 8px 0;
+      font-size: 16px;
+      color: #555;
+    }
+
+    .form-inputs input {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .form-inputs input[type="submit"] {
+      background-color: #BA3333;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .form-inputs input[type="submit"]:hover {
+      background-color: #a12828;
+    }
+
+    /* Options List */
+    .profile-options .option-card {
+      background: #fff;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      transition: background 0.3s, transform 0.2s;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-options .option-card:hover {
+      background: #BA3333;
+      color: white;
+      transform: scale(1.02);
+    }
+
+    .profile-options a {
+      text-decoration: none;
+      color: inherit;
+      font-size: 16px;
+    }
+
+    /* Footer Section */
+    .profile-footer {
+      text-align: center;
+      padding: 20px;
+      background: #f9f9f9;
+      border-top: 1px solid #ddd;
+      width: 100%;
+    }
+
+    .profile-footer button {
+      background-color: #BA3333;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .profile-footer button:hover {
+      background-color: #a12828;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <!-- Header Section -->
+    <div class="profile-header">
+      <h1>Meu Perfil</h1>
+    </div>
+
+    <!-- Content Section -->
+    <div class="profile-content">
+      <!-- User Info -->
+      <div class="profile-info">
+        <h2>Informações Pessoais</h2>
+        <p><strong>Nome:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Usuário:</strong> {{ user.username }}</p>
+
+        <!-- Form for Updating Info -->
+        <form method="POST" class="form-inputs">
+          {% csrf_token %}
+          <input type="text" name="first_name" placeholder="Primeiro Nome" value="{{ user.first_name }}" required>
+          <input type="text" name="last_name" placeholder="Último Nome" value="{{ user.last_name }}" required>
+          <input type="email" name="email" placeholder="Email" value="{{ user.email }}" required>
+          <input type="password" name="password" placeholder="Nova Senha (opcional)">
+          <input type="submit" value="Atualizar Perfil">
+        </form>
+      </div>
+
+      <!-- Options -->
+      <div class="profile-options">
+        <h2>Opções</h2>
+        <div class="option-card">
+          <a href="{% url 'settings' %}">Alterar Configurações</a>
+        </div>
+        <div class="option-card">
+          <a href="{% url 'dashboard' %}">Minhas Equipes Pokémon</a>
+        </div>
+        <div class="option-card">
+          <a href="{% url 'team_analysis' team_id=team_id %}">Estatísticas</a>
+        </div>
+        <div class="option-card">
+          <a href="{% url 'settings' %}">Segurança e Privacidade</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="profile-footer">
+      <button onclick="window.location.href='{% url 'logout' %}'">Sair</button>
+    </div>
+  </div>
+</body>
+</html>

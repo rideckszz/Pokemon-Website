@@ -1,7 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Example of creating a team with first_name and last_name:
+class Sprite(models.Model):
+    name = models.CharField(max_length=100, unique=True)  # Pokémon name
+    url = models.URLField()  # Sprite URL
+
+    def __str__(self):
+        return self.name
+    
 class PokemonTeam(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team_name = models.CharField(max_length=100)
@@ -15,3 +21,10 @@ class PokemonTeam(models.Model):
     def __str__(self):
         return f"{self.team_name} ({self.user.first_name} {self.user.last_name})"
 
+# UserProfile Model
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    picture = models.CharField(max_length=255, default='Sprites/beedrill.png')
+
+    def __str__(self):
+        return self.user.username

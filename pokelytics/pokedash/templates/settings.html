@@ -1,0 +1,262 @@
+{% load static %}
+{% include 'navbar.html' %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Segurança e Privacidade</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .security-container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 100px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .security-header {
+      background-color: #BA3333;
+      color: white;
+      text-align: center;
+      padding: 25px;
+    }
+
+    .security-header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .security-content {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      padding: 30px;
+    }
+
+    .form-inputs, .security-options {
+      flex: 1;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+      font-size: 20px;
+      color: #BA3333;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    .form-inputs input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .form-inputs input[type="submit"] {
+      background-color: #BA3333;
+      color: white;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s;
+      font-size: 16px;
+    }
+
+    .form-inputs input[type="submit"]:hover {
+      background-color: #a12828;
+    }
+
+    .password-requirements {
+      margin-top: 10px;
+      font-size: 14px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .password-requirements li {
+      margin-bottom: 5px;
+      color: red;
+    }
+
+    .password-requirements li.valid {
+      color: green;
+    }
+
+    .security-options div {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #fff;
+      transition: background 0.3s;
+    }
+
+    .security-options div:hover {
+      background-color: #f0f0f0;
+    }
+
+    .security-options label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .security-options input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+    }
+
+    .logo-container {
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .logo-container img {
+      max-width: 350px;
+      height: auto;
+    }
+
+    .security-footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-top: 1px solid #ddd;
+    }
+
+    .security-footer button {
+      background-color: #BA3333;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 16px;
+    }
+
+    .security-footer button:hover {
+      background-color: #a12828;
+    }
+
+    .messages {
+      color: red;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="security-container">
+    <!-- Header Section -->
+    <div class="security-header">
+      <h1>Segurança e Privacidade</h1>
+    </div>
+
+    <!-- Content Section -->
+    <div class="security-content">
+      <!-- Update Password Form -->
+      <div class="form-inputs">
+        <h2 class="section-title">Atualizar Senha</h2>
+        <form method="POST" onsubmit="return validatePassword()">
+          {% csrf_token %}
+          <input type="password" name="current_password" placeholder="Senha Atual" required>
+          <input type="password" id="password" name="password" placeholder="Nova Senha" required>
+          <!-- Password Requirements List -->
+          <ul class="password-requirements" id="password-requirements">
+            <li id="length">➤ Mínimo 8 caracteres</li>
+            <li id="uppercase">➤ Pelo menos 1 letra maiúscula</li>
+            <li id="lowercase">➤ Pelo menos 1 letra minúscula</li>
+            <li id="number">➤ Pelo menos 1 número</li>
+            <li id="special">➤ Pelo menos 1 caractere especial (#@$!%*?&)</li>
+          </ul>
+          <input type="password" name="confirm_password" placeholder="Confirmar Nova Senha" required>
+          <input type="submit" value="Atualizar Senha">
+        </form>
+      </div>
+
+      <!-- Privacy Options -->
+      <div class="security-options">
+        <h2 class="section-title">Configurações de Privacidade</h2>
+        <div>
+          <label>
+            <input type="checkbox" name="email_notifications" {% if user_profile.email_notifications %}checked{% endif %}>
+            Receber notificações por email
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="checkbox" name="two_factor_auth" {% if user_profile.two_factor_auth %}checked{% endif %}>
+            Ativar autenticação em duas etapas
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="checkbox" name="data_sharing" {% if user_profile.data_sharing %}checked{% endif %}>
+            Permitir compartilhamento de dados
+          </label>
+        </div>
+
+        <!-- Logo at the bottom -->
+        <div class="logo-container">
+          <img src="{% static 'Pokeball/PokéLytics_black.png' %}" alt="Logo">
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="security-footer">
+      <button onclick="window.location.href='{% url 'profile' %}'">Voltar ao Perfil</button>
+    </div>
+  </div>
+
+  <!-- JavaScript for Password Validation -->
+  <script>
+    const passwordInput = document.getElementById('password');
+    const requirements = {
+      length: document.getElementById('length'),
+      uppercase: document.getElementById('uppercase'),
+      lowercase: document.getElementById('lowercase'),
+      number: document.getElementById('number'),
+      special: document.getElementById('special'),
+    };
+
+    passwordInput.addEventListener('input', () => {
+      const value = passwordInput.value;
+
+      // Validate each requirement
+      requirements.length.classList.toggle('valid', value.length >= 8);
+      requirements.uppercase.classList.toggle('valid', /[A-Z]/.test(value));
+      requirements.lowercase.classList.toggle('valid', /[a-z]/.test(value));
+      requirements.number.classList.toggle('valid', /[0-9]/.test(value));
+      requirements.special.classList.toggle('valid', /[#@$!%*?&]/.test(value));
+    });
+
+    function validatePassword() {
+      const allValid = Object.values(requirements).every(req => req.classList.contains('valid'));
+      if (!allValid) {
+        alert('A senha não atende a todos os requisitos. Por favor, revise.');
+        return false;
+      }
+      return true;
+    }
+  </script>
+</body>
+</html>

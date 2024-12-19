@@ -1,14 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
 from .forms import RegistrationForm, LoginForm, TeamForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.conf import settings
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+from matplotlib.colors import LinearSegmentedColormap
+from sklearn.preprocessing import MinMaxScaler
 import plotly.graph_objects as go
+import numpy as np
+import seaborn as sns
 
+from .models import Sprite, UserProfile
 import io
 import os
 import urllib, base64
@@ -19,6 +29,108 @@ import requests
 pokemon_data_path = os.path.join(settings.BASE_DIR, 'pokelytics', 'static', 'All_Pokemon.csv')
 pokemon_data = pd.read_csv(pokemon_data_path)
 
+@login_required
+def security_privacy(request):
+    """
+    View to handle security and privacy settings.
+    """
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Validate current password
+        if not check_password(current_password, request.user.password):
+            messages.error(request, "Senha atual incorreta.")
+        elif new_password != confirm_password:
+            messages.error(request, "As novas senhas não coincidem.")
+        elif not new_password:
+            messages.error(request, "A nova senha não pode estar vazia.")
+        else:
+            # Update password
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)  # Keep the user logged in
+            messages.success(request, "Senha atualizada com sucesso!")
+            return redirect('security_privacy')
+
+        # Update privacy settings
+        user_profile.email_notifications = bool(request.POST.get('email_notifications'))
+        user_profile.two_factor_auth = bool(request.POST.get('two_factor_auth'))
+        user_profile.data_sharing = bool(request.POST.get('data_sharing'))
+        user_profile.save()
+
+    return render(request, 'security_privacy.html', {
+        'user_profile': user_profile
+    })
+
+def get_first_team_or_redirect(user):
+    """
+    Get the first team belonging to the user. 
+    Redirect to 'create_team' if no teams exist.
+    """
+    team = PokemonTeam.objects.filter(user=user).first()
+    if team:
+        return team.id
+    else:
+        return None
+    
+@login_required
+def profile(request):
+    """
+    Profile view to display user details and handle profile updates.
+    Redirects to create team if no team exists for the user.
+    """
+    # Ensure the UserProfile exists for the current user
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    # Check for the user's first team
+    team = PokemonTeam.objects.filter(user=request.user).first()
+    if not team:
+        # Redirect to create team page if no team exists
+        return HttpResponseRedirect(reverse('create_team'))
+
+    if request.method == 'POST':
+        # Handle form submission to update user details
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+
+        # Update password if provided
+        if password:
+            user.set_password(password)
+            update_session_auth_hash(request, user)  # Keep user logged in after password change
+
+        user.save()
+        messages.success(request, "Perfil atualizado com sucesso!")
+        return redirect('profile')
+
+    return render(request, 'profile.html', {
+        'user': request.user,
+        'user_profile': user_profile,
+        'team_id': team.id,  # Pass team_id to the template
+    })
+
+@login_required
+def settings(request):
+    if request.method == 'POST':
+        # Handle account-specific settings or password change
+        password = request.POST.get('password')
+        if password:
+            request.user.set_password(password)
+            request.user.save()
+            messages.success(request, "Senha alterada com sucesso!")
+            return redirect('login')
+
+    return render(request, 'settings.html')
 
 
 @login_required
@@ -26,37 +138,14 @@ def dashboard(request):
     user_teams = PokemonTeam.objects.filter(user=request.user)
     team_plots = []
 
-    # Generate a bar chart for each team
     for team in user_teams:
-        # Example data for each Pokémon's stats
-        pokemon_names = [
-            team.pokemon_1, team.pokemon_2, team.pokemon_3,
-            team.pokemon_4, team.pokemon_5, team.pokemon_6
-        ]
-        stats_labels = ['HP', 'Attack', 'Defense', 'Sp. Attack', 'Sp. Defense', 'Speed']
-        combined_stats = [0] * len(stats_labels)
-
-        # Sum stats for the team Pokémon
-        for name in pokemon_names:
-            if name:
-                pokemon_row = pokemon_data[pokemon_data['Name'].str.lower() == name.lower()]
-                if not pokemon_row.empty:
-                    pokemon = pokemon_row.iloc[0]
-                    stats_values = [pokemon['HP'], pokemon['Att'], pokemon['Def'], pokemon['Spa'], pokemon['Spd'], pokemon['Spe']]
-                    combined_stats = [x + y for x, y in zip(combined_stats, stats_values)]
-
-        # Create the bar chart
-        plt.figure(figsize=(6, 4))
-        plt.bar(stats_labels, combined_stats, color='skyblue')
-        plt.title(f"Stats Totais - {team.team_name}")
-        plt.tight_layout()
-
-        # Convert the plot to base64
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', bbox_inches='tight')
-        buffer.seek(0)
-        team_plots.append(base64.b64encode(buffer.getvalue()).decode('utf-8'))
-        plt.close()
+        # Generate charts for the team
+        charts = generate_team_charts(team, pokemon_data)
+        team_plots.append({
+            'team_name': team.team_name,
+            'heatmap': charts['heatmap'],
+            'radar': charts['radar'],
+        })
 
     return render(request, 'dashboard.html', {'teams': user_teams, 'team_plots': team_plots})
 
@@ -103,11 +192,6 @@ def user_logout(request):
     logout(request)
     return redirect('index')
 
-@login_required
-def dashboard(request):
-    # Fetch only the teams belonging to the current user
-    user_teams = PokemonTeam.objects.filter(user=request.user)
-    return render(request, 'dashboard.html', {'teams': user_teams})
 
 @login_required
 def create_team(request):
@@ -135,23 +219,6 @@ def create_team(request):
 
     return render(request, 'create_team.html', {'pokemon_list': pokemon_list})
 
-
-def generate_chart(pokemon):
-    stats_labels = ['HP', 'Attack', 'Defense', 'Sp. Attack', 'Sp. Defense', 'Speed']
-    stats_values = [pokemon['HP'], pokemon['Att'], pokemon['Def'], pokemon['Spa'], pokemon['Spd'], pokemon['Spe']]
-
-    plt.figure(figsize=(4, 4))
-    plt.bar(stats_labels, stats_values, color=['red', 'blue', 'green', 'purple', 'orange', 'cyan'])
-    plt.title(f"{pokemon['Name']} Stats")
-    plt.ylabel('Value')
-    plt.tight_layout()
-
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png', bbox_inches='tight')
-    buffer.seek(0)
-    chart_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-    plt.close('all')
-    return chart_base64
 
 
 
@@ -241,92 +308,186 @@ def register(request):
 # Pokemon grid clicable
 
 
-
 RADAR_CATEGORIES = ['HP', 'Att', 'Def', 'Spa', 'Spd', 'Spe']
+TYPES = ['Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice', 'Fighting', 'Poison', 'Ground', 
+         'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy']
+
+def generate_team_charts(team, pokemon_data):
+    weakness_matrix = []
+    team_pokemon = [team.pokemon_1, team.pokemon_2, team.pokemon_3, team.pokemon_4, team.pokemon_5, team.pokemon_6]
+    
+    radar_data = {}  # Dictionary to hold stats for each Pokémon
+    
+    # Process Pokémon stats and weaknesses
+    for name in team_pokemon:
+        if name:
+            pokemon_row = pokemon_data[pokemon_data['Name'].str.lower() == name.lower()]
+            if not pokemon_row.empty:
+                # Stats for Radar
+                stats_values = [pokemon_row.iloc[0][col] for col in RADAR_CATEGORIES]
+                radar_data[name] = stats_values
+                
+                # Weakness Matrix for Heatmap
+                weaknesses = [pokemon_row.iloc[0][f"Against {ptype}"] for ptype in TYPES]
+                weakness_matrix.append(weaknesses)
+
+    # Custom Gradient Colors for Heatmap
+    custom_colorscale = [
+        (0.0, '#00ECFF'),  # 0x (Cool Blue)
+        (0.0625, '#00FF64'),  # 0.25x (Bright Green)
+        (0.125, '#009900'),  # 0.5x (Dark Green)
+        (0.25, '#D1D1D1'),  # 1x (Light Gray)
+        (0.5, '#FFC300'),  # 2x (Yellow)
+        (1.0, '#FF1313')   # 4x (Bright Red)
+    ]
+    custom_cmap = LinearSegmentedColormap.from_list("custom_heatmap", custom_colorscale, N=256)
+
+    # Generate the Heatmap
+    buffer_heatmap = io.BytesIO()
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(
+        weakness_matrix,
+        annot=True,
+        fmt=".1f",
+        xticklabels=TYPES,
+        yticklabels=[name if name else "N/A" for name in team_pokemon],
+        cmap=custom_cmap,
+        linewidths=0.5,
+        vmin=0,
+        vmax=4,
+        cbar_kws={'label': 'Fraqueza Normalizada (0-4)'}
+    )
+    plt.title("Mapa de Calor - Fraqueza", fontsize=14, color="#BA3333", pad=10)
+    plt.tight_layout()
+    plt.savefig(buffer_heatmap, format='png', bbox_inches='tight')
+    plt.close()
+    heatmap_base64 = base64.b64encode(buffer_heatmap.getvalue()).decode('utf-8')
+
+    # Generate the Radar Chart
+    buffer_radar = io.BytesIO()
+    plt.figure(figsize=(7, 7))
+
+    # Set up angles for the radar chart
+    angles = [n / float(len(RADAR_CATEGORIES)) * 2 * np.pi for n in range(len(RADAR_CATEGORIES))]
+    angles += angles[:1]  # Close the circle
+
+    # Pastel colors for each Pokémon
+    pastel_colors = ['#FFB6C1', '#ADD8E6', '#FFDAB9', '#98FB98', '#E6E6FA', '#F0E68C']
+
+    # Plot each Pokémon
+    for i, (name, stats) in enumerate(radar_data.items()):
+        stats += stats[:1]  # Close the circle
+        plt.polar(angles, stats, color=pastel_colors[i % len(pastel_colors)], linewidth=2, label=name)
+        plt.fill(angles, stats, color=pastel_colors[i % len(pastel_colors)], alpha=0.2)
+
+    # Add customizations
+    plt.xticks(angles[:-1], RADAR_CATEGORIES, color='#333', size=10, fontweight='bold')
+    plt.title("Radar de Estatísticas", size=14, color='#BA3333', pad=10)
+    plt.tight_layout()
+    plt.legend(loc='upper right', fontsize=8, bbox_to_anchor=(1.1, 1.1))
+    plt.savefig(buffer_radar, format='png', bbox_inches='tight')
+    plt.close()
+    radar_base64 = base64.b64encode(buffer_radar.getvalue()).decode('utf-8')
+
+    return {'heatmap': heatmap_base64, 'radar': radar_base64}
+
+def generate_team_barplots(team, pokemon_data):
+    """
+    Generates a bar plot for each Pokémon's stats in the team.
+    Returns a dictionary with Pokémon names and their bar plot images encoded in base64.
+    """
+    team_pokemon = [team.pokemon_1, team.pokemon_2, team.pokemon_3, team.pokemon_4, team.pokemon_5, team.pokemon_6]
+    bar_plots = {}
+    
+    for name in team_pokemon:
+        if name:
+            pokemon_row = pokemon_data[pokemon_data['Name'].str.lower() == name.lower()]
+            if not pokemon_row.empty:
+                # Fetch Pokémon stats
+                stats = [pokemon_row.iloc[0][col] for col in RADAR_CATEGORIES]
+
+                # Generate Bar Plot
+                buffer_bar = io.BytesIO()
+                plt.figure(figsize=(6, 4))
+                plt.bar(RADAR_CATEGORIES, stats, color=['#FFB6C1', '#ADD8E6', '#FFDAB9', '#98FB98', '#E6E6FA', '#F0E68C'])
+                plt.title(f"Estatísticas de {name}", fontsize=12, color="#333", pad=10)
+                plt.ylabel("Valor")
+                plt.xticks(rotation=45)
+                plt.tight_layout()
+                plt.savefig(buffer_bar, format='png', bbox_inches='tight')
+                plt.close()
+                bar_plots[name] = base64.b64encode(buffer_bar.getvalue()).decode('utf-8')
+    
+    return bar_plots
 
 @login_required
 def team_analysis(request, team_id):
-    # Fetch team and Pokémon details
-    team = get_object_or_404(PokemonTeam, id=team_id, user=request.user)
-    teams = PokemonTeam.objects.filter(user=request.user)  # Ensure all user teams are loaded
+    team = PokemonTeam.objects.get(pk=team_id)
+    team_pokemon = [team.pokemon_1, team.pokemon_2, team.pokemon_3, team.pokemon_4, team.pokemon_5, team.pokemon_6]
 
-    selected_pokemon_names = [
-        team.pokemon_1, team.pokemon_2, team.pokemon_3,
-        team.pokemon_4, team.pokemon_5, team.pokemon_6
-    ]
+    # Prepare team Pokémon list with sprite URLs
+    team_pokemon_data = []
+    for name in team_pokemon:
+        if name:
+            formatted_name = name.lower().replace(' ', '-')
+            sprite_url = f"https://img.pokemondb.net/sprites/home/normal/{formatted_name}.png"
+            team_pokemon_data.append({
+                'name': name,
+                'sprite': sprite_url
+            })
 
-    # Filter Pokémon data
-    filtered_data = pokemon_data[pokemon_data['Name'].isin(selected_pokemon_names)]
+    # Filter Pokémon data for team members
+    filtered_data = pokemon_data[pokemon_data['Name'].isin([p for p in team_pokemon if p])]
 
-    # Generate Radar Chart
+    # Radar Chart
     radar_fig = go.Figure()
     for _, row in filtered_data.iterrows():
         radar_fig.add_trace(go.Scatterpolar(
-            r=row[RADAR_CATEGORIES].values,
-            theta=RADAR_CATEGORIES,
+            r=[row['HP'], row['Att'], row['Def'], row['Spa'], row['Spd'], row['Spe']],
+            theta=['HP', 'Attack', 'Defense', 'Sp. Attack', 'Sp. Defense', 'Speed'],
             fill='toself',
             name=row['Name']
         ))
-    radar_fig.update_layout(
-        title="Comparativo de Estatísticas (Radar)",
-        polar=dict(radialaxis=dict(visible=True)),
-        showlegend=True
-    )
-    radar_html = radar_fig.to_html(full_html=False)
+    radar_fig.update_layout(title="Comparativo de Estatísticas", polar=dict(radialaxis=dict(visible=True)))
+    radar_chart = radar_fig.to_html(full_html=False)
 
-    # Generate Stacked Bar Chart
-    bar_fig = go.Figure()
+    # Team Heatmap
+    heatmap_data = filtered_data[[col for col in pokemon_data.columns if col.startswith("Against")]].values
+    heatmap_types = [col.replace("Against ", "") for col in pokemon_data.columns if col.startswith("Against")]
+    team_heatmap_fig = go.Figure(data=go.Heatmap(
+        z=heatmap_data,
+        x=heatmap_types,
+        y=filtered_data['Name'],
+        colorscale=[
+            [0.0, '#00ECFF'], [0.0625, '#00FF64'], [0.125, '#009900'],
+            [0.25, '#D1D1D1'], [0.5, '#FFC300'], [1.0, '#FF1313']
+        ],
+        colorbar=dict(title="Fraqueza")
+    ))
+    team_heatmap_fig.update_layout(title="Mapa de Calor - Fraqueza do Time")
+    team_heatmap = team_heatmap_fig.to_html(full_html=False)
+
+    # Bar Plots for Each Pokémon
+    bar_plots = {}
     for _, row in filtered_data.iterrows():
-        bar_fig.add_trace(go.Bar(
-            x=RADAR_CATEGORIES,
-            y=row[RADAR_CATEGORIES].values,
-            name=row['Name']
-        ))
-    bar_fig.update_layout(
-        title="Estatísticas Empilhadas por Pokémon",
-        barmode='stack',
-        xaxis_title="Atributos",
-        yaxis_title="Valores"
-    )
-    bar_html = bar_fig.to_html(full_html=False)
-
-    # Generate Matchup Heatmaps for Each Pokémon
-    against_columns = [col for col in pokemon_data.columns if col.startswith('Against')]
-    matchup_graphs = {}
-    for _, row in filtered_data.iterrows():
-        matchups = row[against_columns].values
-        types = [col.replace('Against ', '') for col in against_columns]
-
-        heatmap_fig = go.Figure(data=[
-            go.Bar(
-                x=types,
-                y=matchups,
-                marker=dict(color=matchups, colorscale='Viridis'),
-                text=[f"{v:.2f}" for v in matchups],
-                textposition='auto'
-            )
-        ])
-        heatmap_fig.update_layout(
-            title=f"Fraquezas de {row['Name']} (Mapa de Calor)",
-            xaxis_title="Tipos",
-            yaxis_title="Multiplicador de Dano"
-        )
-        matchup_graphs[row['Name']] = heatmap_fig.to_html(full_html=False)
-
-    # Pokémon cards for the bottom section
-    team_pokemon = []
-    for name in selected_pokemon_names:
-        if name:
-            sprite_url = f"https://img.pokemondb.net/sprites/black-white/normal/{name.lower()}.png"
-            team_pokemon.append({'name': name, 'sprite': sprite_url})
+        buffer = io.BytesIO()
+        plt.figure(figsize=(6, 4))
+        plt.bar(['HP', 'Att', 'Def', 'Spa', 'Spd', 'Spe'], 
+                [row['HP'], row['Att'], row['Def'], row['Spa'], row['Spd'], row['Spe']],
+                color=['#FFB6C1', '#ADD8E6', '#FFDAB9', '#98FB98', '#E6E6FA', '#F0E68C'])
+        plt.title(f"{row['Name']} - Estatísticas")
+        plt.ylabel("Valores")
+        plt.tight_layout()
+        plt.savefig(buffer, format="png")
+        plt.close()
+        bar_plots[row['Name']] = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     return render(request, 'team_analysis.html', {
         'team': team,
-        'teams': teams,  # Sidebar teams
-        'radar_chart': radar_html,
-        'bar_chart': bar_html,
-        'matchup_graphs': matchup_graphs,
-        'team_pokemon': team_pokemon  # Pokémon details for the bottom grid
+        'team_pokemon': team_pokemon_data,
+        'radar_chart': radar_chart,
+        'team_heatmap': team_heatmap,
+        'bar_plots': bar_plots
     })
 
 
@@ -350,3 +511,5 @@ def pokemon_detail(request, pokemon_name):
 
 
     return render(request, 'pokemon_detail.html', {'stats': stats})
+
+
