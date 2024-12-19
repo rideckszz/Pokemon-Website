@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-s$xndbk@8)kpzr@3!!=(ss-!yolba!q%d+8!*c%xb-gzll8k#^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'www.pokelytics.com.br']
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
@@ -57,7 +57,7 @@ ROOT_URLCONF = 'pokelytics.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

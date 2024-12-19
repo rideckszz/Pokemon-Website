@@ -6,7 +6,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Análise do Time - {{ team.team_name }}</title>
+  <title>{% block title %}Pokélytics{% endblock %}</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{% static 'Pokeball/pokeball_icon_136305.png' %}">
   <style>
     /* General Reset */
     * {
