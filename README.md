@@ -1,6 +1,5 @@
-# Pokemon-Website PokéLytics 
-
-## Descrição
+# Pokemon-Website
+<img src="https://github.com/user-attachments/assets/c0a8373a-2c3d-4526-a2d3-ffe2a9c2f9e2" alt="PokéLytics" width="200"/>
 
 Este projeto se trata de um website voltada para a criação de times competitivos de Pokémon. O objetivo principal é permitir que os usuários criem suas equipes, analisem as estatísticas dos Pokémons selecionados e obtenham uma visão gráfica do balanceamento do time. Adicionalmente, a plataforma apoia a criação de estratégias mais eficientes, a partir da visualização de dados e análise de desempenho.
 
@@ -22,6 +21,7 @@ Este projeto se trata de um website voltada para a criação de times competitiv
 - **Bootstrap Studio**: Software utilizado para a construção de layouts responsivos e otimização do design utilizando o framework Bootstrap.
 - **PostgreSQL**: Banco de dados relacional utilizado para armazenar e gerenciar as informações dos usuários, times e estatísticas de Pokémon.
 - **Djauth**: Módulo de autenticação do Django, utilizado para gerenciar o sistema de login, registro e controle de acesso de usuários na plataforma.
+- **PokémonDB**: API para obtenção das sprites de Pokémon.
 
 ## Instalação e Configuração
 
@@ -34,5 +34,6 @@ Este projeto se trata de um website voltada para a criação de times competitiv
 - **Simulação e Comparação de Times**: Os usuários podem comparar vários times que criaram, verificando como as estatísticas de diferentes composições de equipes se comportam. Isso permite uma comparação direta entre os times.
 - **Otimização de Composições para Copetitivo**: Ao fornecer dados sobre as melhores combinações de Pokémon e análise do meta atual, pode ajudar a otimizar a composição do time.
 
+   <img src="https://github.com/user-attachments/assets/f820a4db-fdb7-4264-9c06-c0fb0d946600" alt="PokéLytics Bye" >
 
  
